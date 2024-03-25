@@ -1363,10 +1363,6 @@ static void vga_draw_text(VGACommonState *s, int full_update)
             src += 4;
             ch_attr_ptr++;
         }
-        if (cx_max != -1) {
-            dpy_gfx_update(s->con, cx_min * cw, cy * cheight,
-                           (cx_max - cx_min + 1) * cw, cheight);
-        }
         dest += linesize * cheight;
         line1 = line + cheight;
         offset += line_offset;
@@ -1375,6 +1371,7 @@ static void vga_draw_text(VGACommonState *s, int full_update)
         }
         line = line1;
     }
+    dpy_gfx_update_full(s->con);
 }
 
 enum {
@@ -1728,9 +1725,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
             }
         } else {
             if (y_start >= 0) {
-                /* flush to display */
-                dpy_gfx_update(s->con, 0, y_start,
-                               disp_width, y - y_start);
                 y_start = -1;
             }
         }
@@ -1752,11 +1746,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
         }
         d += linesize;
     }
-    if (y_start >= 0) {
-        /* flush to display */
-        dpy_gfx_update(s->con, 0, y_start,
-                       disp_width, y - y_start);
-    }
+    dpy_gfx_update_full(s->con);
     g_free(snap);
     memset(s->invalidated_y_table, 0, sizeof(s->invalidated_y_table));
 }

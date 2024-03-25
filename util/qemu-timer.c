@@ -520,6 +520,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
         break;
     default:
     case QEMU_CLOCK_VIRTUAL:
+    case QEMU_CLOCK_REFRESH:
         break;
     case QEMU_CLOCK_HOST:
         if (!replay_checkpoint(CHECKPOINT_CLOCK_HOST)) {
@@ -637,6 +638,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
         return get_clock();
     default:
     case QEMU_CLOCK_VIRTUAL:
+    case QEMU_CLOCK_REFRESH:
         return cpus_get_virtual_clock();
     case QEMU_CLOCK_HOST:
         return REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());

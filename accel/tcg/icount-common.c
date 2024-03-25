@@ -335,6 +335,10 @@ void icount_start_warp_timer(void)
     clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
     deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL,
                                           ~QEMU_TIMER_ATTR_EXTERNAL);
+    deadline = qemu_soonest_timeout(deadline,
+          qemu_clock_deadline_ns_all(QEMU_CLOCK_REFRESH,
+                                     QEMU_TIMER_ATTR_ALL));
+
     if (deadline < 0) {
         static bool notified;
         if (!icount_sleep && !notified) {
@@ -367,6 +371,7 @@ void icount_start_warp_timer(void)
             seqlock_write_unlock(&timers_state.vm_clock_seqlock,
                                  &timers_state.vm_clock_lock);
             qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
+            qemu_clock_notify(QEMU_CLOCK_REFRESH);
         } else {
             /*
              * We do stop VCPUs and only advance QEMU_CLOCK_VIRTUAL after some

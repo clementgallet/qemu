@@ -45,9 +45,9 @@ static int64_t icount_get_limit(void)
          */
         deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL,
                                               QEMU_TIMER_ATTR_ALL);
-        /* Check realtime timers, because they help with input processing */
+        /* Check refresh timers too */
         deadline = qemu_soonest_timeout(deadline,
-                qemu_clock_deadline_ns_all(QEMU_CLOCK_REALTIME,
+                qemu_clock_deadline_ns_all(QEMU_CLOCK_REFRESH,
                                            QEMU_TIMER_ATTR_ALL));
 
         /*

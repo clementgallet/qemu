@@ -79,28 +79,14 @@ static void dpy_set_ui_info_timer(void *opaque);
 
 static void gui_update(void *opaque)
 {
-    uint64_t interval = GUI_REFRESH_INTERVAL_IDLE;
-    uint64_t dcl_interval;
     DisplayState *ds = opaque;
-    DisplayChangeListener *dcl;
 
     ds->refreshing = true;
     dpy_refresh(ds);
     ds->refreshing = false;
 
-    QLIST_FOREACH(dcl, &ds->listeners, next) {
-        dcl_interval = dcl->update_interval ?
-            dcl->update_interval : GUI_REFRESH_INTERVAL_DEFAULT;
-        if (interval > dcl_interval) {
-            interval = dcl_interval;
-        }
-    }
-    if (ds->update_interval != interval) {
-        ds->update_interval = interval;
-        trace_console_refresh(interval);
-    }
-    ds->last_update = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-    timer_mod(ds->gui_timer, ds->last_update + interval);
+    ds->last_update = qemu_clock_get_ms(QEMU_CLOCK_REFRESH);
+    timer_mod(ds->gui_timer, ds->last_update + GUI_REFRESH_INTERVAL_DEFAULT);
 }
 
 static void gui_setup_refresh(DisplayState *ds)
@@ -115,8 +101,8 @@ static void gui_setup_refresh(DisplayState *ds)
     }
 
     if (need_timer && ds->gui_timer == NULL) {
-        ds->gui_timer = timer_new_ms(QEMU_CLOCK_REALTIME, gui_update, ds);
-        timer_mod(ds->gui_timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME));
+        ds->gui_timer = timer_new_ms(QEMU_CLOCK_REFRESH, gui_update, ds);
+        timer_mod(ds->gui_timer, qemu_clock_get_ms(QEMU_CLOCK_REFRESH));
     }
     if (!need_timer && ds->gui_timer != NULL) {
         timer_free(ds->gui_timer);

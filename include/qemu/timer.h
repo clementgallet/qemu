@@ -49,6 +49,7 @@ typedef enum {
     QEMU_CLOCK_VIRTUAL = 1,
     QEMU_CLOCK_HOST = 2,
     QEMU_CLOCK_VIRTUAL_RT = 3,
+    QEMU_CLOCK_REFRESH = 4,
     QEMU_CLOCK_MAX
 } QEMUClockType;
 
